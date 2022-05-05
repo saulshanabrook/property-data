@@ -1,0 +1,11 @@
+name: property-data
+channels:
+  - conda-forge
+dependencies:
+  - libspatialite
+  - datasette
+  - pip
+  - pip:
+      - shapefile-to-sqlite
+      - datasette-geojson-map
+  - requests
