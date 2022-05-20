@@ -19,6 +19,7 @@ TOWNS = [
     "Bernardston",
     "Leyden",
     "Colrain",
+    "Wendell",
 ]
 
 DB_FILE = "property-data.db"
@@ -72,6 +73,7 @@ def main():
         "parcels",
         """
 select
+  AsGeoJSON(tp.geometry),
   a.BLDG_VAL,
   a.LAND_VAL,
   a.OTHER_VAL,
