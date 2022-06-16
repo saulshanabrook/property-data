@@ -4,8 +4,20 @@ channels:
 dependencies:
   - libspatialite
   - datasette
+  - bambi
+  - pandas
+  - altair
+  - seaborn
+  - rich
+  - jupyterlab
+  - beautifulsoup4
+  - openpyxl
+  - mkl-service
   - pip
   - pip:
       - shapefile-to-sqlite
       - datasette-geojson-map
+      - datasette-leaflet-geojson
+      - dbfread
+      - sqlite_utils
   - requests
