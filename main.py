@@ -34,6 +34,8 @@ TOWNS = [
     "Leverett",
     "Shutesbury",
     "New Salem",
+    "Erving",
+    "Charlemont",
 ]
 
 DB_FILE = "property-data.db"
@@ -79,41 +81,39 @@ def get_town_download_urls_by_town() -> dict[str, str]:
 
 def main():
     get_sales()
-    # not_downloaded_towns = [t for t in TOWNS if not list(Path("data").glob(f"*{t}"))]
-    # for town in track(not_downloaded_towns, "Downloading town data..."):
-    #     url = get_town_download_urls_by_town()[town.upper()]
-    #     r = requests.get(url)
-    #     z = zipfile.ZipFile(BytesIO(r.content))
-    #     z.extractall("data")
+    not_downloaded_towns = [t for t in TOWNS if not list(Path("data").glob(f"*{t}"))]
+    for town in track(not_downloaded_towns, "Downloading town data..."):
+        url = get_town_download_urls_by_town()[town.upper()]
+        r = requests.get(url)
+        z = zipfile.ZipFile(BytesIO(r.content))
+        z.extractall("data")
     db = Database(DB_FILE, recreate=False)
-    # added_use_codes = False
-    # for town_dir in track(
-    #     [p for p in Path("data").iterdir() if p.is_dir()], "Converting to sqlite..."
-    # ):
-    #     for table in ["OthLeg", "TaxPar"]:
-    #         (shp_file,) = town_dir.glob(f"*{table}*.shp")
-    #         subprocess.run(
-    #             [
-    #                 "shapefile-to-sqlite",
-    #                 DB_FILE,
-    #                 "--table",
-    #                 table,
-    #                 str(shp_file),
-    #                 "--spatialite_mod=mod_spatialite.dylib",
-    #                 "--prefix-pk",
-    #             ],
-    #             check=True,
-    #         )
-    #     for table in ["Assess", "UC_LUT"]:
-    #         if table == "UC_LUT":
-    #             if added_use_codes:
-    #                 continue
-    #             added_use_codes = True
-    #         (dbf_file,) = town_dir.glob(f"*{table}*.dbf")
-    #         db[table].insert_all(DBF(dbf_file))
-    # db.
-    db.create
-    df = pd.read_excel(
+    added_use_codes = False
+    for town_dir in track(
+        [p for p in Path("data").iterdir() if p.is_dir()], "Converting to sqlite..."
+    ):
+        for table in ["OthLeg", "TaxPar"]:
+            (shp_file,) = town_dir.glob(f"*{table}*.shp")
+            subprocess.run(
+                [
+                    "shapefile-to-sqlite",
+                    DB_FILE,
+                    "--table",
+                    table,
+                    str(shp_file),
+                    "--spatialite_mod=mod_spatialite.dylib",
+                    "--prefix-pk",
+                ],
+                check=True,
+            )
+        for table in ["Assess", "UC_LUT"]:
+            if table == "UC_LUT":
+                if added_use_codes:
+                    continue
+                added_use_codes = True
+            (dbf_file,) = town_dir.glob(f"*{table}*.dbf")
+            db[table].insert_all(DBF(dbf_file))
+    pd.read_excel(
         "data/LA3ParcelSearch.xlsx", skiprows=4, parse_dates=["Sale Date"]
     ).to_sql("LA3", db.conn, if_exists="append", index=False)
 
