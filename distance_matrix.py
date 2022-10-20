@@ -5,7 +5,6 @@ import googlemaps
 
 __all__ = ["add_directions_columns"]
 
-gmaps = googlemaps.Client(key=os.environ["GOOGLE_MAPS_API_KEY"])
 
 
 def add_directions_columns(df):
@@ -25,6 +24,7 @@ def fetch_data(lat_longs):
     """
     Fetch data, using the cached values if possible. Returns a list of results.
     """
+    gmaps = googlemaps.Client(key=os.environ["GOOGLE_MAPS_API_KEY"])
     data = load_data()
     unfetched_lat_longs = [lat_long for lat_long in lat_longs if lat_long not in data]
     for group in chunker(unfetched_lat_longs, 20):

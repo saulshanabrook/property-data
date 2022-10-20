@@ -17,7 +17,7 @@ sql = "SELECT *, Hex(ST_AsBinary(ST_Transform(GEOMETRY, 26986))) as geom FROM pa
 df = gpd.GeoDataFrame.from_postgis(sql, con, geom_col="geom").drop(
     ['AsGeoJSON(tp.geometry)', 'geometry'],
     axis=1
-).set_crs(epsg=26986)
+)
 
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', 100)
