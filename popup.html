@@ -1,0 +1,142 @@
+<!--Add buttons to initiate auth sequence and sign out-->
+
+
+<script type="text/javascript">
+    /* exported gapiLoaded */
+    /* exported gisLoaded */
+    /* exported handleAuthClick */
+    /* exported handleSignoutClick */
+
+    // TODO(developer): Set to client ID and API key from the Developer Console
+    const CLIENT_ID = '108627190651-pvpp7oqvk2psj1amkfdvh1r8t6u382mj.apps.googleusercontent.com';
+    const API_KEY = 'AIzaSyAzw_aQN3EZNIRT8IhAlEHjAW1gApIUQ0g';
+
+    // Discovery doc URL for APIs used by the quickstart
+    const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
+
+    // Authorization scopes required by the API; multiple scopes can be
+    // included, separated by spaces.
+    const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
+
+    let tokenClient;
+    let gapiInited = false;
+    let gisInited = false;
+
+    // let auth = document.getElementById('authorize_button')
+    // let signout = document.getElementById('signout_button')
+    // let good = document.getElementById('good_button')
+    // let bad = document.getElementById('bad_button')
+    // auth.style.visibility = 'hidden';
+    // signout.style.visibility = 'hidden';
+    // good.style.visibility = 'hidden';
+    // bad.style.visibility = 'hidden';
+
+    /**
+     * Callback after api.js is loaded.
+     */
+    function gapiLoaded() {
+    gapi.load('client', intializeGapiClient);
+    }
+
+    /**
+     * Callback after the API client is loaded. Loads the
+     * discovery doc to initialize the API.
+     */
+    async function intializeGapiClient() {
+    await gapi.client.init({
+        apiKey: API_KEY,
+        discoveryDocs: [DISCOVERY_DOC],
+    });
+    gapiInited = true;
+    maybeEnableButtons();
+    }
+
+    /**
+     * Callback after Google Identity Services are loaded.
+     */
+    function gisLoaded() {
+    tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID,
+        scope: SCOPES,
+        callback: '', // defined later
+    });
+    gisInited = true;
+    maybeEnableButtons();
+    }
+
+    /**
+     * Enables user interaction after all libraries are loaded.
+     */
+    function maybeEnableButtons() {
+    // if (gapiInited && gisInited) {
+    //     document.getElementById('authorize_button').style.visibility = 'visible';
+    // }
+    }
+
+    /**
+     *  Sign in the user upon button click.
+     */
+    function handleAuthClick() {
+    tokenClient.callback = async (resp) => {
+        if (resp.error !== undefined) {
+        throw (resp);
+        }
+        // document.getElementById('good_button').style.visibility = 'visible';
+        // document.getElementById('bad_button').style.visibility = 'visible';
+        // document.getElementById('authorize_button').innerText = 'Refresh';
+    };
+
+    if (gapi.client.getToken() === null) {
+        // Prompt the user to select a Google Account and ask for consent to share their data
+        // when establishing a new session.
+        tokenClient.requestAccessToken({prompt: 'consent'});
+    } else {
+        // Skip display of account chooser and consent dialog for an existing session.
+        tokenClient.requestAccessToken({prompt: ''});
+    }
+    }
+
+
+
+    function handleGoodClick() {
+    addRow('Good');
+    }
+
+    function handleBadClick() {
+    addRow('Bad');
+    }
+    /**
+     * Print the names and majors of students in a sample spreadsheet:
+     * https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
+     */
+    async function addRow(a, b) {
+
+    await gapi.client.sheets.spreadsheets.values.append({
+        // The ID of the spreadsheet to update.
+        spreadsheetId: '1HpW1V0rcQd2ZBQM5esvtukCMMge_0FDc0L9HKV61DL4',  // TODO: Update placeholder value.
+
+        // The A1 notation of a range to search for a logical table of data.
+        // Values will be appended after the last row of the table.
+        range: 'Sheet1',  // TODO: Update placeholder value.
+
+        // How the input data should be interpreted.
+        valueInputOption: 'USER_ENTERED',  // TODO: Update placeholder value.
+
+        // How the input data should be inserted.
+        insertDataOption: 'INSERT_ROWS',  // TODO: Update placeholder value.
+    }, {
+        "majorDimension": "ROWS",
+        "values": [
+            [
+            a,
+            b
+            ]
+        ],
+        "range": "Sheet1"
+        });
+
+    // Fetch first 10 files
+    }
+</script>
+<script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+<script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>

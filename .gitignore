@@ -6,3 +6,4 @@ data
 *.profraw
 .ipynb_checkpoints
 .env
+SWEETVIZ_REPORT.html
