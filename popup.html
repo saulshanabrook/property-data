@@ -97,19 +97,11 @@
     }
 
 
-
-    function handleGoodClick() {
-    addRow('Good');
-    }
-
-    function handleBadClick() {
-    addRow('Bad');
-    }
     /**
      * Print the names and majors of students in a sample spreadsheet:
      * https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
      */
-    async function addRow(a, b) {
+    async function addRow(row) {
 
     await gapi.client.sheets.spreadsheets.values.append({
         // The ID of the spreadsheet to update.
@@ -127,10 +119,7 @@
     }, {
         "majorDimension": "ROWS",
         "values": [
-            [
-            a,
-            b
-            ]
+            row
         ],
         "range": "Sheet1"
         });
