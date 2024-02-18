@@ -13,11 +13,14 @@ dependencies:
   - beautifulsoup4
   - openpyxl
   - mkl-service
+  - geopandas
   - pip
+  - ydata-profiling
   - pip:
       - shapefile-to-sqlite
       - datasette-geojson-map
       - datasette-leaflet-geojson
       - dbfread
       - sqlite_utils
+      - googlemaps
   - requests

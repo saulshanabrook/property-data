@@ -67,7 +67,13 @@ HIDE_USE_DESCS = [
     "Hospitals (Charitable Org.)",
     "Recreation, Active Use (Charitable Org.)",
     "Improved County or Regional Correctional",
-    "United States Government"
+    "United States Government",
+    "Cable TV Transmitting Facilities",
+    "Electrical Plant",
+    "Mass. Highway Dept. (MHD) (non-reimbursable)",
+    "Elementary Level (Educational Private)",
+    "Shopping Centers/Malls",
+    "College or University (Educational Private)",
     # "Undevelopable Industrial Land"
 ]
 
