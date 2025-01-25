@@ -28,7 +28,7 @@ def fetch_data(lat_longs):
     data = load_data()
     unfetched_lat_longs = [lat_long for lat_long in lat_longs if lat_long not in data]
     for group in chunker(unfetched_lat_longs, 20):
-        results = gmaps.distance_matrix((42.58774713218186, -72.60008261544128), group, mode='driving')
+        results = gmaps.distance_matrix((42.6018727,-72.5759791), group, mode='walking')
         for lat_long, element in zip(group, results['rows'][0]['elements']):
             data[lat_long] = element
     save_data(data)
@@ -44,8 +44,11 @@ def chunker(seq, size):
 
 
 def load_data():
-    with open('distance_data.pickle', 'rb') as f:
-        return pickle.load(f)
+    try:
+        with open('distance_data.pickle', 'rb') as f:
+            return pickle.load(f)
+    except Exception:
+        return {}
 
 def save_data(data):
     with open('distance_data.pickle', 'wb') as f:
