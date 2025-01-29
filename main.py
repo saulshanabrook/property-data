@@ -1,3 +1,28 @@
+# /// script
+# requires-python = ">=3.11"
+# dependencies = [
+#     "beautifulsoup4",
+#     "dbfread",
+#     "openpyxl>=3.1.5",
+#     "pandas",
+#     "requests",
+#     "rich",
+#     "shapefile-to-sqlite",
+#     "sqlite-utils",
+#     "fiona<1.9",
+# ]
+# [tool.uv.sources]
+# shapefile-to-sqlite = { git = "https://github.com/saulshanabrook/shapefile-to-sqlite", branch = "main" }
+# ///
+
+# require only fiona bc of this error
+#   File "/Users/saul/Library/Caches/uv/archive-v0/gujtHHy0P_suD2zU4rC6T/lib/python3.11/site-packages/shapefile_to_sqlite/utils.py", line 65, in yield_features
+#     feature.pop("type")
+#   File "<frozen _collections_abc>", line 912, in pop
+#   File "/Users/saul/Library/Caches/uv/archive-v0/gujtHHy0P_suD2zU4rC6T/lib/python3.11/site-packages/fiona/model.py", line 150, in __getitem__
+#     return props[item]
+#            ~~~~~^^^^^^
+# KeyError: 'type'
 import functools
 import subprocess
 import zipfile
@@ -13,29 +38,29 @@ from sqlite_utils import Database
 
 TOWNS = [
     "Greenfield",
-    "Shelburne",
-    "Conway",
-    "Deerfield",
-    "Montague",
-    "Gill",
-    "Bernardston",
-    "Leyden",
-    "Colrain",
-    "Wendell",
-    "Heath",
-    "Northfield",
-    "Buckland",
-    "Shelburne",
-    "Ashfield",
-    "Cummington",
-    "Goshen",
-    "Whately",
-    "Sunderland",
-    "Leverett",
-    "Shutesbury",
-    "New Salem",
-    "Erving",
-    "Charlemont",
+    # "Shelburne",
+    # "Conway",
+    # "Deerfield",
+    # "Montague",
+    # "Gill",
+    # "Bernardston",
+    # "Leyden",
+    # "Colrain",
+    # "Wendell",
+    # "Heath",
+    # "Northfield",
+    # "Buckland",
+    # "Shelburne",
+    # "Ashfield",
+    # "Cummington",
+    # "Goshen",
+    # "Whately",
+    # "Sunderland",
+    # "Leverett",
+    # "Shutesbury",
+    # "New Salem",
+    # "Erving",
+    # "Charlemont",
 ]
 
 DB_FILE = "property-data.db"
@@ -54,6 +79,7 @@ def get_town_values() -> dict[str, str]:
 
 def get_sales():
     print("Getting sales")
+    Path("data").mkdir(exist_ok=True)
     p = Path("data/LA3ParcelSearch.xlsx")
     if p.exists():
         return
