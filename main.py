@@ -113,7 +113,7 @@ def main():
         r = requests.get(url)
         z = zipfile.ZipFile(BytesIO(r.content))
         z.extractall("data")
-    db = Database(DB_FILE, recreate=False)
+    db = Database(DB_FILE, recreate=True)
     added_use_codes = False
     for town_dir in track(
         [p for p in Path("data").iterdir() if p.is_dir()], "Converting to sqlite..."
@@ -141,7 +141,7 @@ def main():
             db[table].insert_all(DBF(dbf_file))
     pd.read_excel(
         "data/LA3ParcelSearch.xlsx", skiprows=4, parse_dates=["Sale Date"]
-    ).to_sql("LA3", db.conn, if_exists="append", index=False)
+    ).to_sql("LA3", db.conn, if_exists="replace", index=False)
 
     db.create_view(
         "parcels",
@@ -188,7 +188,87 @@ select
 from
   Assess a
   inner join TaxPar tp on tp.LOC_ID = a.LOC_ID
-  join UC_LUT lut on a.USE_CODE = lut.USE_CODE
+  left join UC_LUT lut on a.USE_CODE = lut.USE_CODE
+""",
+        replace=True,
+    )
+    # create a sales view that includes property data.
+    # if a LOC_ID shows up twice from a sale, exclude that data, but still include the sale
+    # this happens for condos, where the LOC_ID is the same for the building and each unit
+    db.create_view(
+        "sales",
+        """
+WITH assess_counts AS (
+  SELECT
+    LOC_ID,
+    COUNT(*) AS cnt
+  FROM
+    Assess
+  GROUP BY
+    LOC_ID
+),
+assess_single AS (
+  /* Keep only rows from Assess where LOC_ID appears exactly once. */
+  SELECT
+    a.*
+  FROM
+    Assess a
+    JOIN assess_counts c ON a.LOC_ID = c.LOC_ID
+  WHERE
+    c.cnt = 1
+)
+select
+  l.Process,
+  l."Sale Date",
+  l.Seller,
+  l.Buyer,
+  l."NAL Code",
+  l."Sale Price",
+  l."Prior Assessed Value",
+  l."Current Assessed Value",
+  l."A/S Ratio",
+  a.BLDG_VAL,
+  a.LAND_VAL,
+  a.OTHER_VAL,
+  a.TOTAL_VAL,
+  a.FY,
+  a.LOT_SIZE,
+  a.LS_DATE,
+  a.LS_PRICE,
+  a.USE_CODE,
+  a.SITE_ADDR,
+  a.ADDR_NUM,
+  a.FULL_STR,
+  a.LOCATION,
+  a.CITY,
+  a.ZIP,
+  a.OWNER1,
+  a.OWN_ADDR,
+  a.OWN_CITY,
+  a.OWN_STATE,
+  a.OWN_ZIP,
+  a.OWN_CO,
+  a.LS_BOOK,
+  a.LS_PAGE,
+  a.REG_ID,
+  a.ZONING,
+  a.YEAR_BUILT,
+  a.BLD_AREA,
+  a.UNITS,
+  a.RES_AREA,
+  a.STYLE,
+  a.STORIES,
+  a.NUM_ROOMS,
+  a.LOT_UNITS,
+  a.CAMA_ID,
+  lut.USE_DESC,
+  tp.geometry,
+  tp.LOC_ID as rowid
+from
+  LA3 l
+  left join assess_single a on l."Location Id" = a.LOC_ID
+  left join TaxPar tp on tp.LOC_ID = a.LOC_ID
+  left join UC_LUT lut on a.USE_CODE = lut.USE_CODE
 """,
         replace=True,
     )
